@@ -30,7 +30,7 @@
 // Tests for SPIFlashLogger.write() with data that larger than allocated memory
 class WriteTooBigDataTestCase extends Core {
 
-    function testBasic() {
+    function testWriteException() {
         return Promise(function(resolve, reject) {
             if (!isAvailable()) {
                 resolve();

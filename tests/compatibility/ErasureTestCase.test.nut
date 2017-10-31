@@ -30,7 +30,7 @@
 // Tests for SPIFlashLogger.erase() and eraseAll()
 class ErasureTestCase extends Core {
 
-    function testReadEraseRead() {
+    function testReadEraseReadSequence() {
         if (!isAvailable()) {
             return;
         }

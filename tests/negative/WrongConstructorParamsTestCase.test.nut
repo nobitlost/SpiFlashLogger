@@ -30,7 +30,7 @@
 // Tests for SPIFlashLogger constructor
 class WrongConstructorParamsTestCase extends Core {
 
-    function testStartGreater() {
+    function testExceptionForStartParameter() {
         return Promise(function(resolve, reject) {
             if (!isAvailable()) {
                 resolve();
@@ -48,7 +48,7 @@ class WrongConstructorParamsTestCase extends Core {
         }.bindenv(this));
     }
 
-    function testStartNotFirstByte() {
+    function testExceptionForStartNotFirstByte() {
         return Promise(function(resolve, reject) {
             if (!isAvailable()) {
                 resolve();
@@ -66,7 +66,7 @@ class WrongConstructorParamsTestCase extends Core {
         }.bindenv(this));
     }
 
-    function testEndNotFirstByte() {
+    function testExceptionForEndNotFirstByte() {
         return Promise(function(resolve, reject) {
             if (!isAvailable()) {
                 resolve();
@@ -84,7 +84,7 @@ class WrongConstructorParamsTestCase extends Core {
         }.bindenv(this));
     }
 
-    function testStartEndNotFirstByte() {
+    function testExceptionForStartEndNotFirstByte() {
         return Promise(function(resolve, reject) {
             if (!isAvailable()) {
                 resolve();

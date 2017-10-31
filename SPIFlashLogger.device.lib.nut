@@ -147,6 +147,7 @@ class SPIFlashLogger {
         // Unexpected index position
         if (index == 0)
             return null;
+
         // identify first sector to read
         local seekTo = math.abs(index);
         local count = 0;
@@ -211,6 +212,7 @@ class SPIFlashLogger {
 
         // function to read one sector, optionally continuing to the next one
         local readSector;
+        local addrs_b = null;
         readSector = function(i) {
 
             if (i >= _sectors){
@@ -228,7 +230,7 @@ class SPIFlashLogger {
                 sector = (_at_sec - i + _sectors) % _sectors;
             }
 
-            local addrs_b = _getObjAddrs(sector);
+            addrs_b = _getObjAddrs(sector);
 
             if (addrs_b.len() == 0) {
                 return imp.wakeup(0, function() {
@@ -354,6 +356,12 @@ class SPIFlashLogger {
         }
     }
 
+    function _getNextSectorId() {
+        if (_next_sec_id == 0x7FFFFFFF || _next_sec_id == 0)
+            _next_sec_id = 1;
+        return _next_sec_id++;
+    }
+
     // Gets the logged object at the specified position
     function _getObj(pos, cb = null) {
         local requested_pos = pos;
@@ -455,13 +463,13 @@ class SPIFlashLogger {
             // Prepare the next sector
             _erase(sector, sector+1, true);
             // Write a new sector id
-            meta.writen(_next_sec_id++, 'i');
+            meta.writen(_getNextSectorId(), 'i');
         } else {
             // Make sure we have a valid sector id
             if (_getSectorMetadata(sector).id > 0) {
                 meta.writen(0xFFFFFFFF, 'i');
             } else {
-                meta.writen(_next_sec_id++, 'i');
+                meta.writen(_getNextSectorId(), 'i');
             }
         }
 
@@ -541,10 +549,8 @@ class SPIFlashLogger {
     }
 
     function _init() {
-        local best_id = 0;          // The highest id
-        local best_sec = 0;         // The sector with the highest id
-        local best_map = 0xFFFF;    // The map of the sector with the highest id
-
+        local first_sec = {"id" : 0, "sec" : 0, "map": 0xFFFF}; // The smallest id
+        local last_sec = {"id" : 0, "sec" : 0, "map": 0xFFFF};// The highest id
         // Read all the metadata
         _enable();
         for (local sector = 0; sector < _sectors; sector++) {
@@ -552,10 +558,17 @@ class SPIFlashLogger {
             local meta = _getSectorMetadata(sector);
 
             if (meta.id > 0) {
-                if (meta.id > best_id) {
-                    best_sec = sector;
-                    best_id = meta.id;
-                    best_map = meta.map;
+                // identify last sector
+                if (meta.id > last_sec.id) {
+                    last_sec.sec = sector;
+                    last_sec.id = meta.id;
+                    last_sec.map = meta.map;
+                }
+                // identify first sector
+                if (first_sec.id == 0 || meta.id < first_sec.id) {
+                    first_sec.sec = sector;
+                    first_sec.id = meta.id;
+                    first_sec.map = meta.map;
                 }
             } else {
                 // This sector has no id, we are going to assume it is clean
@@ -564,12 +577,18 @@ class SPIFlashLogger {
         }
         _disable();
 
+        // handle ID overflow use-case
+        if (last_sec.id - first_sec.id >= (0xFFFF - _sectors))
+            last_sec = first_sec;
+
         _at_pos = 0;
-        _at_sec = best_sec;
-        _next_sec_id = best_id+1;
+        _at_sec = last_sec.sec;
+        _next_sec_id = last_sec.id;
+        // increase sector id
+        _getNextSectorId();
         for (local bit = 1; bit <= 16; bit++) {
             local mod = 1 << bit;
-            _at_pos += (~best_map & mod) ? SPIFLASHLOGGER_CHUNK_SIZE : 0;
+            _at_pos += (~last_sec.map & mod) ? SPIFLASHLOGGER_CHUNK_SIZE : 0;
         }
     }
 
