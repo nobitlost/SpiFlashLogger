@@ -51,6 +51,7 @@ class DimensionsTestCase extends Core {
                     reject(ex);
                 }
                 resolve();
+                return;
             } catch (ex) {
                 reject("Unexpected error: " + ex);
             }
@@ -77,6 +78,7 @@ class DimensionsTestCase extends Core {
                     assertDeepEqualWrap(size, dimensions.size, "dimensions.size");
                 } catch (ex) {
                     reject(ex);
+                    return;
                 }
                 resolve();
             } catch (ex) {
@@ -105,6 +107,7 @@ class DimensionsTestCase extends Core {
                     assertDeepEqualWrap(size, dimensions.size, "dimensions.size");
                 } catch (ex) {
                     reject(ex);
+                    return;
                 }
                 resolve();
             } catch (ex) {
@@ -134,6 +137,7 @@ class DimensionsTestCase extends Core {
                     assertDeepEqualWrap(size, dimensions.size, "dimensions.size");
                 } catch (ex) {
                     reject(ex);
+                    return;
                 }
                 resolve();
             } catch (ex) {

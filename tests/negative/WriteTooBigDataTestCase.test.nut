@@ -50,6 +50,7 @@ class WriteTooBigDataTestCase extends Core {
                 logger.write(data);
             } catch (ex) {
                 resolve();
+                return;
             }
             reject("Writing data, larger than allocated memory, did not raise an error");
         }.bindenv(this));

@@ -34,7 +34,7 @@ class ErasureTestCase extends Core {
         if (!isAvailable()) {
             return;
         }
-        local start = math.rand() % 120;
+        local start = math.rand() % 15;
         local end = start + 1;
         start *= SPIFLASHLOGGER_SECTOR_SIZE;
         end   *= SPIFLASHLOGGER_SECTOR_SIZE;
@@ -52,6 +52,7 @@ class ErasureTestCase extends Core {
                     next();
                 } catch (ex) {
                     reject(ex);
+                    next(false);
                 }
             }.bindenv(this), resolve);
         }.bindenv(this))
@@ -59,9 +60,10 @@ class ErasureTestCase extends Core {
             return Promise(function(resolve, reject) {
                 logger.read(function(data, addr, next) {
                     reject("Data was not erased");
+                    next(false);
                 }.bindenv(this), resolve);
             }.bindenv(this));
-        });
+        }.bindenv(this));
     }
 
     function testEraseAll() {
@@ -70,7 +72,7 @@ class ErasureTestCase extends Core {
                 resolve();
                 return;
             }
-            local start = math.rand() % 120;
+            local start = math.rand() % 15;
             local end = start + 1;
             start *= SPIFLASHLOGGER_SECTOR_SIZE;
             end   *= SPIFLASHLOGGER_SECTOR_SIZE;
@@ -82,6 +84,7 @@ class ErasureTestCase extends Core {
             logger.eraseAll();
             logger.read(function(data, addr, next) {
                 reject("Data was not erased");
+                next(false);
             }.bindenv(this), resolve);
         }.bindenv(this));
     }

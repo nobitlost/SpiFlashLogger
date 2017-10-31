@@ -42,6 +42,7 @@ class WrongConstructorParamsTestCase extends Core {
                 local logger = SPIFlashLogger(start, end);
             } catch (ex) {
                 resolve();
+                return;
             }
             reject("Invalid parameters did not raise an error");
         }.bindenv(this));
@@ -59,6 +60,7 @@ class WrongConstructorParamsTestCase extends Core {
                 local logger = SPIFlashLogger(start, end);
             } catch (ex) {
                 resolve();
+                return;
             }
             reject("Invalid parameters did not raise an error");
         }.bindenv(this));
@@ -76,6 +78,7 @@ class WrongConstructorParamsTestCase extends Core {
                 local logger = SPIFlashLogger(start, end);
             } catch (ex) {
                 resolve();
+                return;
             }
             reject("Invalid parameters did not raise an error");
         }.bindenv(this));
@@ -93,6 +96,7 @@ class WrongConstructorParamsTestCase extends Core {
                 local logger = SPIFlashLogger(start, end);
             } catch (ex) {
                 resolve();
+                return;
             }
             reject("Invalid parameters did not raise an error");
         }.bindenv(this));

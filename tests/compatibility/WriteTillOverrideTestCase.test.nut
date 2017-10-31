@@ -51,14 +51,20 @@ class WriteTillOverrideTestCase extends Core {
                         logger.write(messageDifferent);
                     }
                 }
+                local hasData = false;
                 logger.read(function(data, addr, next) {
+                    hasData = true;
                     try {
                         assertDeepEqualWrap(messageDifferent, data, "Wrong data");
                         resolve();
                     } catch (ex) {
                         reject(ex);
                     }
-                }.bindenv(this), reject);
+                    next(false);
+                }.bindenv(this), function() {
+                  if (!hasData)
+                      reject();
+                }.bindenv(this));
             } catch (ex) {
                 reject("Unexpected error: " + ex);
             }

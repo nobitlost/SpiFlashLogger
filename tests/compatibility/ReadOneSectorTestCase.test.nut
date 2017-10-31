@@ -39,7 +39,7 @@ class ReadOneSectorTestCase extends Core {
                     resolve();
                     return;
                 }
-                local start = math.rand() % 120;
+                local start = math.rand() % 15;
                 local end = start + 1;
                 start *= SPIFLASHLOGGER_SECTOR_SIZE;
                 end   *= SPIFLASHLOGGER_SECTOR_SIZE;
@@ -67,6 +67,7 @@ class ReadOneSectorTestCase extends Core {
                     assertDeepEqualWrap(expected--, data, "Wrong data");
                     if (expected == 0) {
                         resolve();
+                        next(false);
                     } else {
                         next();
                     }
@@ -90,6 +91,7 @@ class ReadOneSectorTestCase extends Core {
                     expected -= 2;
                     if (expected < 0) {
                         resolve();
+                        next(false);
                     } else {
                         next();
                     }
@@ -113,6 +115,7 @@ class ReadOneSectorTestCase extends Core {
                     expected -= 2;
                     if (expected < 0) {
                         resolve();
+                        next(false);
                     } else {
                         next();
                     }
@@ -136,6 +139,7 @@ class ReadOneSectorTestCase extends Core {
                     expected -= 3;
                     if (expected < 0) {
                         resolve();
+                        next(false);
                     } else {
                         next();
                     }
@@ -159,6 +163,7 @@ class ReadOneSectorTestCase extends Core {
                     next();
                 } catch (ex) {
                     reject(ex);
+                    next(false);
                 }
             }.bindenv(this), resolve);
         }.bindenv(this));
@@ -178,46 +183,9 @@ class ReadOneSectorTestCase extends Core {
                     next();
                 } catch (ex) {
                     reject(ex);
+                    next(false);
                 }
             }.bindenv(this), resolve, 2);
-        }.bindenv(this));
-    }
-
-    function testReadForwardsByTwosStartsOne() {
-        return Promise(function(resolve, reject) {
-            if (!isAvailable()) {
-                resolve();
-                return;
-            }
-            local expected = 2;
-            logger.read(function(data, addr, next) {
-                try {
-                    assertDeepEqualWrap(expected, data, "Wrong data");
-                    expected += 2;
-                    next();
-                } catch (ex) {
-                    reject(ex);
-                }
-            }.bindenv(this), resolve, 2, 1);
-        }.bindenv(this));
-    }
-
-    function testReadForwardsByThrees() {
-        return Promise(function(resolve, reject) {
-            if (!isAvailable()) {
-                resolve();
-                return;
-            }
-            local expected = 1;
-            logger.read(function(data, addr, next) {
-                try {
-                    assertDeepEqualWrap(expected, data, "Wrong data");
-                    expected += 3;
-                    next();
-                } catch (ex) {
-                    reject(ex);
-                }
-            }.bindenv(this), resolve, 3);
         }.bindenv(this));
     }
 
@@ -234,8 +202,30 @@ class ReadOneSectorTestCase extends Core {
                     next(false);
                 } catch (ex) {
                     reject(ex);
+                    next(false);
                 }
             }.bindenv(this), resolve);
         }.bindenv(this));
     }
-}
+
+    function testReadFwdByTwoStartsOne() {
+        return Promise(function(resolve, reject) {
+            if (!isAvailable()) {
+                resolve();
+                return;
+            }
+            local expected = 2;
+            logger.read(function(data, addr, next) {
+                try {
+                    assertDeepEqualWrap(expected, data, "Wrong data");
+                    expected += 2;
+                    next();
+                } catch (ex) {
+                    reject(ex);
+                    next(false);
+                }
+            }.bindenv(this), resolve, 2, 1);
+        }.bindenv(this));
+    }
+
+};
